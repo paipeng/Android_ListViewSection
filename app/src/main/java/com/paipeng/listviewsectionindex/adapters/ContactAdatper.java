@@ -44,11 +44,16 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
             super(v);
             view = v;
 
-
             mTextView = (TextView) v.findViewById(R.id.nameTextView);
             titleTextView = (TextView) v.findViewById(R.id.titleTextView);
+
+            if (mTextView == null) {
+
+                mTextView = (TextView) v.findViewById(R.id.sectionTextView);
+            }
         }
     }
+
 
     public ContactAdatper(Context context, List<Contact> objects) {
         contactList = objects;
@@ -60,10 +65,11 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
             ch = ch.toUpperCase(Locale.US);
 
             // HashMap will prevent duplicates
-            mapIndex.put(ch, x);
+            mapIndex.put(ch, x+1);
         }
 
         Set<String> sectionLetters = mapIndex.keySet();
+
 
         // create a list from the set to sort
         ArrayList<String> sectionList = new ArrayList<String>(sectionLetters);
@@ -75,26 +81,28 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
         sectionList.toArray(sections);
 
         Log.d(TAG, "sections " + sections[0]);
-
-
     }
-
-
 
     // Create new views (invoked by the layout manager)
     @Override
-    public ContactAdatper.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
+    public ContactAdatper.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_contact, parent, false);
-        // set the view's size, margins, paddings and layout parameters
-//        ...
 
-        ViewHolder vh = new ViewHolder(v);
+        if (viewType == 0) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_contact, parent, false);
+            // set the view's size, margins, paddings and layout parameters
 
+            ViewHolder vh = new ViewHolder(v);
+            return vh;
+        } else {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_section, parent, false);
+            // set the view's size, margins, paddings and layout parameters
 
-        return vh;
+            ViewHolder vh = new ViewHolder(v);
+            return vh;
+        }
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -102,25 +110,71 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.mTextView.setText(contactList.get(position).getLastName());
-        holder.titleTextView.setText(String.valueOf(contactList.get(position).getId()));
+
+        if (getFirstElement(position)) {
+
+        } else {
+            int positionWithMapIndex = getPositionWithMapIndex(position);
+            Contact contact = contactList.get(positionWithMapIndex);
+            holder.mTextView.setText(contact.getLastName());
+            holder.titleTextView.setText(String.valueOf(contact.getId()));
+
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
         // Just as an example, return 0 or 2 depending on position
         // Note that unlike in ListView adapters, types don't have to be contiguous
-        return position % 2 * 2;
+        return getFirstElement(position)?1:0;
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return contactList.size();
+        return contactList.size() + sections.length;
     }
 
     @Override
     public HashMap<String, Integer> getMapIndex() {
         return this.mapIndex;
+    }
+
+    private boolean getFirstElement(int position) {
+        int c = 0;
+        if (position == c) {
+            return true;
+        }
+        int l = 0;
+        for (String key : mapIndex.keySet()) {
+            Integer number = mapIndex.get(key);
+            c += number.intValue();
+
+            if (position == c) {
+                return true;
+            }
+
+            if (position < c) {
+                break;
+            }
+            l++;
+        }
+        return false;
+    }
+
+    private int getPositionWithMapIndex(int position) {
+        int c = 0;
+        int factor = 1;
+        for (String key : mapIndex.keySet()) {
+            Integer number = mapIndex.get(key);
+            c += number.intValue();
+
+            if (position < c) {
+                return position-factor;
+            }
+
+            factor ++;
+        }
+        return position;
     }
 }
