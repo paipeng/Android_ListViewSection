@@ -6,17 +6,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
-
-import com.paipeng.listviewsectionindex.R;
 /**
  * Created by flaviusmester on 23/02/15.
  */
 public class FastScrollRecyclerView extends RecyclerView {
+    private final static String TAG = FastScrollRecyclerView.class.getSimpleName();
     private Context ctx;
 
     private boolean setupThings = false;
@@ -91,6 +91,7 @@ public class FastScrollRecyclerView extends RecyclerView {
                     int positionInData = 0;
                     if( ((FastScrollRecyclerViewInterface)getAdapter()).getMapIndex().containsKey(section.toUpperCase()) )
                         positionInData = ((FastScrollRecyclerViewInterface)getAdapter()).getMapIndex().get(section.toUpperCase());
+                    Log.i(TAG, "scroll to position " + positionInData);
                     this.scrollToPosition(positionInData);
                     FastScrollRecyclerView.this.invalidate();
                 }
@@ -110,6 +111,7 @@ public class FastScrollRecyclerView extends RecyclerView {
                     int positionInData = 0;
                     if(((FastScrollRecyclerViewInterface)getAdapter()).getMapIndex().containsKey(section.toUpperCase()) )
                         positionInData = ((FastScrollRecyclerViewInterface)getAdapter()).getMapIndex().get(section.toUpperCase());
+                    Log.i(TAG, "scroll to position " + positionInData);
                     this.scrollToPosition(positionInData);
                     FastScrollRecyclerView.this.invalidate();
 

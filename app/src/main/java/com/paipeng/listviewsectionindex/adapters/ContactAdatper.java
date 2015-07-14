@@ -6,15 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AlphabetIndexer;
-import android.widget.ArrayAdapter;
-import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import com.paipeng.listviewsectionindex.R;
 import com.paipeng.listviewsectionindex.model.Contact;
-
-import org.w3c.dom.Text;
+import com.paipeng.listviewsectionindex.views.FastScrollRecyclerViewInterface;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,8 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-
-import com.paipeng.listviewsectionindex.views.FastScrollRecyclerViewInterface;
 
 /**
  * Created by paipeng on 13/07/15.
@@ -40,6 +34,7 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
         public TextView mTextView;
         public TextView titleTextView;
         public View view;
+        public int type;
         public ViewHolder(View v) {
             super(v);
             view = v;
@@ -51,6 +46,14 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
 
                 mTextView = (TextView) v.findViewById(R.id.sectionTextView);
             }
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
         }
     }
 
@@ -65,7 +68,7 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
             ch = ch.toUpperCase(Locale.US);
 
             // HashMap will prevent duplicates
-            mapIndex.put(ch, x+1);
+            mapIndex.put(ch, x+ mapIndex.keySet().size() +1);
         }
 
         Set<String> sectionLetters = mapIndex.keySet();
@@ -87,22 +90,21 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
     @Override
     public ContactAdatper.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-
+        View v = null;
         if (viewType == 0) {
-            View v = LayoutInflater.from(parent.getContext())
+            v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_contact, parent, false);
             // set the view's size, margins, paddings and layout parameters
 
-            ViewHolder vh = new ViewHolder(v);
-            return vh;
         } else {
-            View v = LayoutInflater.from(parent.getContext())
+            v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_section, parent, false);
             // set the view's size, margins, paddings and layout parameters
 
-            ViewHolder vh = new ViewHolder(v);
-            return vh;
         }
+        ViewHolder vh = new ViewHolder(v);
+        vh.setType(viewType);
+        return vh;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -111,14 +113,17 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 
-        if (getFirstElement(position)) {
-
-        } else {
+        if (holder.getType() == 0) {
             int positionWithMapIndex = getPositionWithMapIndex(position);
             Contact contact = contactList.get(positionWithMapIndex);
             holder.mTextView.setText(contact.getLastName());
             holder.titleTextView.setText(String.valueOf(contact.getId()));
 
+        } else {
+            String sectionString = getSectionString(position);
+            if (sectionString != null) {
+                holder.mTextView.setText(sectionString);
+            }
         }
     }
 
@@ -141,25 +146,48 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
     }
 
     private boolean getFirstElement(int position) {
-        int c = 0;
-        if (position == c) {
-            return true;
-        }
-        int l = 0;
+        int factor = 0;
         for (String key : mapIndex.keySet()) {
-            Integer number = mapIndex.get(key);
-            c += number.intValue();
-
-            if (position == c) {
+            if (position == 0) {
                 return true;
             }
 
-            if (position < c) {
+            Integer number = mapIndex.get(key);
+            int c = number.intValue();
+            if (position == (c + factor)) {
+                return true;
+            }
+
+            if (position < (c + factor)) {
                 break;
             }
-            l++;
+            //factor++;
         }
         return false;
+    }
+
+    private String getSectionString(int position) {
+        Log.i(TAG, "getSectionString " + position);
+        int factor = 0;
+        int pre = 0;
+        for (String key : mapIndex.keySet()) {
+
+            Integer number = mapIndex.get(key);
+            int c = number.intValue();
+
+            Log.i(TAG, "check " + (pre + " - " +  factor));
+
+            if (position == (pre + factor)) {
+                return key;
+            }
+
+            if (position < (pre+ factor)) {
+                break;
+            }
+            pre = c;
+            //factor++;
+        }
+        return null;
     }
 
     private int getPositionWithMapIndex(int position) {
@@ -167,9 +195,9 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
         int factor = 1;
         for (String key : mapIndex.keySet()) {
             Integer number = mapIndex.get(key);
-            c += number.intValue();
+            c = number.intValue();
 
-            if (position < c) {
+            if (position < (c + factor)) {
                 return position-factor;
             }
 
