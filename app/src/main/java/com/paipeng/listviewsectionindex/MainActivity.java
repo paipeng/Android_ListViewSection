@@ -1,24 +1,23 @@
 package com.paipeng.listviewsectionindex;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.ListView;
+import android.view.View;
+import android.widget.AdapterView;
 
 import com.paipeng.listviewsectionindex.adapters.ContactAdatper;
 import com.paipeng.listviewsectionindex.model.Contact;
 import com.paipeng.listviewsectionindex.views.FastScrollRecyclerViewItemDecoration;
-import com.paipeng.listviewsectionindex.views.MyAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -84,6 +83,8 @@ public class MainActivity extends ActionBarActivity {
         FastScrollRecyclerViewItemDecoration decoration = new FastScrollRecyclerViewItemDecoration(this);
         mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
     }
 
 

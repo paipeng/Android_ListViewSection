@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:drawable="@android:color/holo_red_light"
+        android:state_pressed="true"/>
+
+    <!--
+    <item android:drawable="@drawable/fastscroll_thumb_pressed_holo" android:state_pressed="true"/>
+    -->
+    <!--
+
+    <item
+        android:drawable="@android:color/holo_red_light"
+        android:state_selected="true"/>
+        -->
+</selector>

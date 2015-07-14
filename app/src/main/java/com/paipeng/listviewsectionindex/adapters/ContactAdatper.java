@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.paipeng.listviewsectionindex.R;
 import com.paipeng.listviewsectionindex.model.Contact;
@@ -35,9 +36,15 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
         public TextView titleTextView;
         public View view;
         public int type;
-        public ViewHolder(View v) {
+        public ViewHolder(View v, final Context context) {
             super(v);
             view = v;
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "Item click nr: " + mTextView.getText(), Toast.LENGTH_SHORT).show();
+                }
+            });
 
             mTextView = (TextView) v.findViewById(R.id.nameTextView);
             titleTextView = (TextView) v.findViewById(R.id.titleTextView);
@@ -102,7 +109,8 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
             // set the view's size, margins, paddings and layout parameters
 
         }
-        ViewHolder vh = new ViewHolder(v);
+        ViewHolder vh = new ViewHolder(v, parent.getContext());
+
         vh.setType(viewType);
         return vh;
     }
@@ -167,7 +175,7 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
     }
 
     private String getSectionString(int position) {
-        Log.i(TAG, "getSectionString " + position);
+        //Log.i(TAG, "getSectionString " + position);
         int factor = 0;
         int pre = 0;
         for (String key : mapIndex.keySet()) {
@@ -175,7 +183,7 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
             Integer number = mapIndex.get(key);
             int c = number.intValue();
 
-            Log.i(TAG, "check " + (pre + " - " +  factor));
+            //Log.i(TAG, "check " + (pre + " - " +  factor));
 
             if (position == (pre + factor)) {
                 return key;
@@ -191,18 +199,24 @@ public class ContactAdatper extends RecyclerView.Adapter<ContactAdatper.ViewHold
     }
 
     private int getPositionWithMapIndex(int position) {
+        //Log.i(TAG, "getPositionWithMapIndex " + position);
         int c = 0;
-        int factor = 1;
+        int factor = 0;
         for (String key : mapIndex.keySet()) {
             Integer number = mapIndex.get(key);
             c = number.intValue();
 
-            if (position < (c + factor)) {
-                return position-factor;
+            //Log.i(TAG, "check " + (c + " - " +  factor));
+
+            if (position < (c + 0)) {
+                return position-factor-1;
             }
 
             factor ++;
         }
         return position;
     }
+
+
+
 }
